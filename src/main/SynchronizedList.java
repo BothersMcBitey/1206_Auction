@@ -3,7 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class SynchronizedList<E>{
+public class SynchronizedList<E> implements Iterable<E>{
 
 	private ArrayList<E> list;
 	

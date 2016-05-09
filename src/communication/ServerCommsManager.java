@@ -2,25 +2,40 @@ package communication;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Iterator;
+import java.util.Date;
 
 import main.SynchronizedList;
 
 public class ServerCommsManager {
 
 	private ServerSocket socket;
-	private SynchronizedList<Comms> connections;
-	private SynchronizedList<Message> messages;
+	private SynchronizedList<Session> connectedSessions;
  	
 	private Thread newConnectionListener;
-	private Thread messageListener;
 	
 	public ServerCommsManager(int port, int backlog) throws IOException {
 		socket = new ServerSocket(port, backlog);
 		newConnectionListener = new Thread(new ConnectionListener());
-		newConnectionListener.start();
-		messageListener = new Thread(new MessageListener());
-		messageListener.start();			
+		newConnectionListener.start();			
+	}
+	
+	/**
+	 * notifies all connected users of impending server shutdown
+	 * @param time
+	 */
+	public void notifyAllConnections(Date time){
+		for(Session s : connectedSessions){
+			s.notifyEndSession(time);
+		}
+	}
+	
+	/**
+	 * Ends all connected sessions in a clean, secure way
+	 */
+	public void closeAllConnections(){
+		for(Session s : connectedSessions){
+			s.endSession();
+		}
 	}
 	
 	class ConnectionListener implements Runnable {
@@ -29,26 +44,11 @@ public class ServerCommsManager {
 		public void run(){
 			while(true){
 				try {
-					connections.add(new Comms(socket.accept()));
+					connectedSessions.add(new Session(new Comms(socket.accept())));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-	}
-	
-	class MessageListener implements Runnable {
-
-		@Override
-		public void run() {
-			Iterator<Comms> it = connections.iterator();
-			while(it.hasNext()){
-				try {
-					messages.add(it.next().receiveMessage());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}	
 	}
 }

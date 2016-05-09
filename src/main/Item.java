@@ -3,19 +3,28 @@ package main;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Item holds all the data for the auction of a single item.
+ * 
+ * All fields in Item are final, to allow Items to be sent to clients without them being able to modify fields.
+ * The downside of this is every time a bid is made or the owner modifies a filed, every session holding that item
+ * has to request the new data from the database and re-construct the object. 
+ * @author Callum
+ *
+ */
 public class Item {
+		
+	private final int UIID; //Actually never changes
+	private final String title;
+	private final String description;
+	private final Category category;
+	private final int vendorID; //also never changes
+	private final Date startTime; //never changes
+	private final Date endTime; //never changes
+	private final int reservePrice; // can only be lowered
+	private final ArrayList<Bid> bids;
 	
-	private final int UIID;
-	private String title;
-	private String description;
-	private Category category;
-	private int vendorID;
-	private Date startTime;
-	private Date endTime;
-	private float reservePrice;
-	private ArrayList<Bid> bids;
-	
-	public Item(int UIID, String title, String description, Category category, int vendorID, Date startTime, Date endTime, float reservePrice, ArrayList<Bid> bids) {
+	public Item(int UIID, String title, String description, Category category, int vendorID, Date startTime, Date endTime, int reservePrice, ArrayList<Bid> bids) {
 		this.UIID = UIID;
 		this.title = title;
 		this.description = description;
@@ -31,64 +40,32 @@ public class Item {
 		return title;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getDescription() {
 		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Category getCategory() {
 		return category;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
 	public int getVendorID() {
 		return vendorID;
-	}
-
-	public void setVendorID(int vendorID) {
-		this.vendorID = vendorID;
 	}
 
 	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
-
 	public Date getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
-
-	public float getReservePrice() {
+	public int getReservePrice() {
 		return reservePrice;
-	}
-
-	public void setReservePrice(float reservePrice) {
-		this.reservePrice = reservePrice;
 	}
 
 	public ArrayList<Bid> getBids() {
 		return bids;
-	}
-
-	public void setBids(ArrayList<Bid> bids) {
-		this.bids = bids;
 	}
 
 	public int getUIID() {
