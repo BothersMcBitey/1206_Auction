@@ -1,5 +1,7 @@
 package main;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -12,8 +14,11 @@ import java.util.Date;
  * @author Callum
  *
  */
-public class Item {
+public class Item implements Serializable{
 		
+	private static final long serialVersionUID = 1L;
+	public static final long MinimumAuctionLength = 1000 * 60 * 60; //1hour
+	
 	private final int UIID; //Actually never changes
 	private final String title;
 	private final String description;
@@ -70,5 +75,9 @@ public class Item {
 
 	public int getUIID() {
 		return UIID;
+	}
+	
+	public boolean isOpen(){
+		return (endTime.getTime() > Date.from(Instant.now()).getTime());
 	}
 }

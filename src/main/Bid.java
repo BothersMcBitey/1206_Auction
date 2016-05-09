@@ -1,18 +1,21 @@
 package main;
 
-public class Bid {
+import java.io.Serializable;
 
-	private final User user;
+public class Bid implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	private final int UUID;
 	private final int value;
 	
-	public Bid(User user, int value) throws IllegalArgumentException{
-		this.user = user;
+	public Bid(int UUID, int value) throws IllegalArgumentException{
+		this.UUID = UUID;
 		if(value < 0) throw new IllegalArgumentException("bid cannot be less than 0");
 		this.value = value;
 	}
 
-	public User getUser() {
-		return user;
+	public int getUserID() {
+		return UUID;
 	}
 
 	public int getValue() {

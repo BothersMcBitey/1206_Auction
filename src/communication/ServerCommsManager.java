@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.util.Date;
 
 import main.SynchronizedList;
+import server.DataPersistence;
 
 public class ServerCommsManager {
 
@@ -13,10 +14,13 @@ public class ServerCommsManager {
  	
 	private Thread newConnectionListener;
 	
-	public ServerCommsManager(int port, int backlog) throws IOException {
+	private DataPersistence dataAccess;
+	
+	public ServerCommsManager(int port, int backlog, DataPersistence dataAccess) throws IOException {
 		socket = new ServerSocket(port, backlog);
 		newConnectionListener = new Thread(new ConnectionListener());
-		newConnectionListener.start();			
+		newConnectionListener.start();
+		this.dataAccess = dataAccess; 
 	}
 	
 	/**
@@ -25,7 +29,11 @@ public class ServerCommsManager {
 	 */
 	public void notifyAllConnections(Date time){
 		for(Session s : connectedSessions){
-			s.notifyEndSession(time);
+			try {
+				s.notifyEndSession(time);
+			} catch (IOException e) {
+				System.err.println("Unable to notify user " + s.getUserID() + " in session " + s.getSessionNo() + " of impending closure");
+			}
 		}
 	}
 	
@@ -42,9 +50,11 @@ public class ServerCommsManager {
 		
 		@Override
 		public void run(){
+			int sessionID = 0;
 			while(true){
 				try {
-					connectedSessions.add(new Session(new Comms(socket.accept())));
+					connectedSessions.add(new Session(new Comms(socket.accept()), sessionID, System.out, dataAccess));
+					sessionID++;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

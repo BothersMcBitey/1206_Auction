@@ -12,7 +12,7 @@ public class SearchAuctionsRequestMessage extends Message {
 	//search for
 	private final Category category;
 	private final String seller, title, description;
-	private final int ID;
+	private final int itemID;
 	private final long timeLeft;
 	private final int price;
 	private final boolean isSold, timeIsGreater, priceIsGreater, userHasBidOn;
@@ -28,7 +28,7 @@ public class SearchAuctionsRequestMessage extends Message {
 		this.seller = seller.trim();
 		this.title = title.trim();
 		this.description = description.trim();
-		this.ID = iD;
+		this.itemID = iD;
 		if(timeLeft < 0) throw new IllegalArgumentException("Time left cannot be less than 0");
 		this.timeLeft = timeLeft;
 		if(price < 0) throw new IllegalArgumentException("Price cannot be less than 0");
@@ -54,7 +54,7 @@ public class SearchAuctionsRequestMessage extends Message {
 	}
 
 	public int getID() {
-		return ID;
+		return itemID;
 	}
 
 	public long getTimeLeft() {

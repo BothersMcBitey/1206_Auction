@@ -6,9 +6,9 @@ public class User {
 	private String forename;
 	private String surname;
 	private String screenName;
-	private byte[] passwordHash;
+	private char[] passwordHash;
 	
-	public User(int UUID, String forename, String surname, String screenName, byte[] passwordHash){
+	public User(int UUID, String forename, String surname, String screenName, char[] passwordHash){
 		this.UUID = UUID;
 		this.forename = forename;
 		this.surname = surname;
@@ -32,11 +32,11 @@ public class User {
 		this.surname = surname;
 	}
 
-	public byte[] getPasswordHash() {
+	public char[] getPasswordHash() {
 		return passwordHash;
 	}
 
-	public void setPasswordHash(byte[] passwordHash) {
+	public void setPasswordHash(char[] passwordHash) {
 		this.passwordHash = passwordHash;
 	}
 

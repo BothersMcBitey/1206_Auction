@@ -35,4 +35,13 @@ public class Message implements Serializable{
 	public MessageType getType() {
 		return type;
 	}
+	
+	@Override
+	public String toString(){
+		String s ="";
+		s += timestamp.toString() + ", " +
+			clientIP + ", " + sessionNo + 
+			", " + type.toString();
+		return s;
+	}
 }

@@ -3,14 +3,15 @@ package communication.messages;
 public class RegisterMessage extends Message {
 
 	private static final long serialVersionUID = 1L;	
-	private final String forename, surname, screenName, password; 
+	private final String forename, surname, userName;
+	private final char[] password; 
 	
-	public RegisterMessage(String clientIP, int sessionNo, String forename, String surname, String screenName, String password) {
+	public RegisterMessage(String clientIP, int sessionNo, String forename, String surname, String userName, char[] password) {
 		super(clientIP, sessionNo, MessageType.Register);
 		this.forename = forename.trim();
 		this.surname = surname.trim();
-		this.screenName = screenName.trim();
-		this.password = password.trim();
+		this.userName = userName.trim();
+		this.password = password;
 	}
 
 	public String getForename() {
@@ -21,11 +22,11 @@ public class RegisterMessage extends Message {
 		return surname;
 	}
 
-	public String getScreenName() {
-		return screenName;
+	public String getUserName() {
+		return userName;
 	}
 
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 }

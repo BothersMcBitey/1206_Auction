@@ -1,7 +1,10 @@
 package main;
 
-public class Stats {
+import java.io.Serializable;
 
+public class Stats implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private final int totalMoneyRaised, currentTotalBidValue, HighestCostItem, activeAuctions, totalAuctions;
 
 	public Stats(int totalMoneyRaised, int currentTotalBidValue, int highestCostItem, int activeAuctions, int totalAuctions) {
