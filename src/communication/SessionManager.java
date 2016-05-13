@@ -1,12 +1,13 @@
 package communication;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Date;
 
 import main.SynchronizedList;
 import server.DataManager;
-import server.DataPersistence;
 
 public class SessionManager {
 
@@ -16,6 +17,7 @@ public class SessionManager {
 	private Thread newConnectionListener;
 	
 	private DataManager data;
+	private PrintStream log;
 	
 	/**
 	 * 
@@ -24,16 +26,18 @@ public class SessionManager {
 	 * @param data - The data manager to redirect information requests to
 	 * @throws IOException
 	 */
-	public SessionManager(int port, int backlog, DataManager data) throws IOException {
+	public SessionManager(int port, int backlog, DataManager data, PrintStream log) throws IOException {
 		socket = new ServerSocket(port, backlog);
 		newConnectionListener = new Thread(new ConnectionListener());
 		newConnectionListener.start();
+		connectedSessions = new SynchronizedList<>();
 		this.data = data;
+		this.log = log;
 	}
 	
 	/**
 	 * notifies all connected users of impending server shutdown
-	 * @param time
+	 * @param time - time of shutdown
 	 */
 	public void notifyAllConnections(Date time){
 		for(Session s : connectedSessions){
@@ -50,7 +54,11 @@ public class SessionManager {
 	 */
 	public void closeAllConnections(){
 		for(Session s : connectedSessions){
-			s.endSession();
+			try {
+				s.endSession();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -61,7 +69,11 @@ public class SessionManager {
 			int sessionID = 0;
 			while(true){
 				try {
-//					connectedSessions.add(new Session(new Comms(socket.accept()), sessionID, System.out));
+					Socket sock = socket.accept();
+					Comms c = new Comms(sock, log);
+					Session s = new Session(c, sessionID, log, data);
+					s.start();
+					connectedSessions.add(s);
 					sessionID++;
 				} catch (IOException e) {
 					e.printStackTrace();

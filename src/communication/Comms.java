@@ -13,50 +13,72 @@ public class Comms {
 
 	private Socket socket;
 	private PrintStream log;
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
 	
-	public Comms(String host, int port) throws IOException{
+	public Comms(String host, int port, PrintStream log) throws IOException{
 		socket = new Socket(host, port);
-		socket.setKeepAlive(true);
-//		socket.setSoTimeout(500);
+		init(log);
 	}
 	
-	public Comms(Socket socket){
+	public Comms(Socket socket, PrintStream log){
 		this.socket = socket;
+		init(log);
+	}
+	
+	private void init(PrintStream log){		
+		 try {
+			 this.log = log;
+			socket.setKeepAlive(true);						
+		} catch (IOException e) {		
+			e.printStackTrace();
+		}
+	}
+	
+	public void close(){
+		log.println("closing connection " + socket.getInetAddress().getHostAddress());
+		try {
+			socket.close();
+			in.close();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String getIP(){
 		return socket.getInetAddress().getHostAddress();
 	}
 	
-	public void sendMessage(Message msg) throws IOException{
-		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+	public synchronized void sendMessage(Message msg) throws IOException{ 
+		if(out == null) out = new ObjectOutputStream(socket.getOutputStream());		
 		log.println("sending " + msg.toString());
 		try{
 			out.writeObject(msg);
 		} catch(IOException e){
 			log.print("sending message failed.");
+			e.printStackTrace();
 			throw e;
 		}
-		out.close();
+		out.flush();
 	}
 	
-	public Message receiveMessage() throws IOException, ClassNotFoundException{
-		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+	public synchronized Message receiveMessage() throws IOException, ClassNotFoundException{
+		if(in == null)in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 		Message msg = null; 
-		if(in.available() > 0){
-			try {
+		try {
+			while(msg == null){
 				msg = (Message) in.readObject();
-			} catch (ClassNotFoundException e) {
-				log.println("failed to read in message, ClassNotFound");
-				log.println(e.getStackTrace());
-				throw e;
-			} catch(IOException e1){
-				log.println("failed to read in message, IOException");
-				log.println(e1.getStackTrace());
-				throw e1;
 			}
+		} catch (ClassNotFoundException e) {
+			log.println("failed to read in message, ClassNotFound");
+			log.println(e.getStackTrace());
+			throw e;
+		} catch(IOException e1){
+			log.println("failed to read in message, IOException");
+			log.println(e1.getStackTrace());
+			throw e1;
 		}
-		in.close();
 		log.println("recieved message " + msg.toString());
 		return msg;
 	}

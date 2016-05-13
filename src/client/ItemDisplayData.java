@@ -1,14 +1,12 @@
 package client;
 
-import java.util.ArrayList;
 import java.util.Date;
 
-import main.Bid;
 import main.Category;
 
 public class ItemDisplayData {
 
-	private final int UIID;
+	public final int UIID;
 	public String title;
 	public String description;
 	public Category category;

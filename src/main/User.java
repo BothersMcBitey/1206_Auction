@@ -12,14 +12,14 @@ public class User {
 	private ArrayList<Integer> bidOnItemIDs;
 	private ArrayList<Integer> sellingItemIDs;
 	
-	public User(int UUID, String forename, String surname, String screenName, char[] passwordHash, ArrayList<Integer> bidOnItemIDs, ArrayList<Integer> sellingItemIDs){
+	public User(int UUID, String forename, String surname, String screenName, char[] passwordHash){
 		this.UUID = UUID;
 		this.forename = forename;
 		this.surname = surname;
 		this.screenName = screenName;
 		this.passwordHash = passwordHash;
-		this.setBidOnItemIDs(bidOnItemIDs);
-		this.setSellingItemIDs(sellingItemIDs);
+		bidOnItemIDs = new ArrayList<>();
+		sellingItemIDs = new ArrayList<>();
 	}
 	
 	public void addSellingItem(Integer UIID){

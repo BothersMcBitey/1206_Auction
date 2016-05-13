@@ -3,10 +3,7 @@ package client;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,11 +23,6 @@ public class UITemplate extends JPanel {
 		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 0.5, 0.2, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
 		
 		JLabel logo = new JLabel(new ImageIcon("AuctionLogo.png"));
-		logo.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				listener.actionPerformed(new ActionEvent(this, 1, "Home"));
-			}
-		});
 		c.anchor = GridBagConstraints.NORTHWEST;
 		add(logo, c);
 		
@@ -43,6 +35,7 @@ public class UITemplate extends JPanel {
 		add(browseAuctions, c);
 		
 		JButton createAuction = new JButton("Create Auction");
+		createAuction.setActionCommand("Show Auction Create");
 		createAuction.addActionListener(listener);
 		c.gridx = 2;
 		add(createAuction, c);
@@ -57,7 +50,7 @@ public class UITemplate extends JPanel {
 		c.gridx = 4;
 		add(viewSelling, c);
 		
-		JButton viewInfo = new JButton("View Info");
+		JButton viewInfo = new JButton("Log off");
 		viewInfo.addActionListener(listener);
 		c.gridx = 5;
 		add(viewInfo, c);

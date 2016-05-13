@@ -1,8 +1,10 @@
 package client;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -18,6 +20,10 @@ public class ClientUI {
 	//the space on the template used to display each screens unique content 
 	private JPanel targetPanel;
 	
+	private LogIn logIn = null;	
+	private CreateAuction createAuction = null;	
+	private ItemPanel itemViewerPanel = null;
+
 	public ClientUI(ActionListener listener) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -27,7 +33,7 @@ public class ClientUI {
 		}
 		frame = new JFrame("Client v0.1");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1920, 1080);
+		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		
 		this.listener = listener;
 		
@@ -36,8 +42,9 @@ public class ClientUI {
 		frame.setVisible(true);
 	}
 	
-	public void displayLogIn(){		
-		frame.setContentPane(new LogIn(listener));
+	public void displayLogIn(){	
+		if(logIn == null) logIn = new LogIn(listener);
+		frame.setContentPane(logIn);
 		templateDisplayed = false;
 		frame.revalidate();
 	}
@@ -50,10 +57,35 @@ public class ClientUI {
 	}
 	
 	public void displayHome(){
+		display(new JPanel());
+	}
+	
+	private void display(JPanel panel){
 		if(!templateDisplayed) displayTemplate();
 		targetPanel.removeAll();
-		targetPanel.add(new Home(listener));
+		targetPanel.add(panel);
 		frame.revalidate();
 	}
 	
+	public void displayItem(ItemDisplayData i){
+		itemViewerPanel = new ItemPanel(listener, i);
+		display(itemViewerPanel);
+	}
+	
+	public void displayCreateAuction(){
+		if(createAuction == null) createAuction = new CreateAuction(listener);
+		display(createAuction);
+	}
+	
+	public LogIn getLogIn() {
+		return logIn;
+	}
+
+	public void showNotification(String notification) {
+		JOptionPane.showMessageDialog(frame, notification);
+	}
+	
+	public CreateAuction getCreateAuction() {
+		return createAuction;
+	}
 }
