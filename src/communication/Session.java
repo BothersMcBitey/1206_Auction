@@ -58,19 +58,19 @@ public class Session extends Thread{
 				Message message = comms.receiveMessage();		
 				switch (message.getType()) {
 					case LogIn:
-						LogIn((LogInMessage) message);						
+						LogIn( message);						
 						break;
 						
 					case Register:
-						RegisterUser((RegisterMessage) message);
+						RegisterUser( message);
 						break;
 					
 					case CreateAuction:
-						CreateAuction((CreateAuctionMessage) message);						
+						CreateAuction( message);						
 						break;	
 					
 					case Bid:
-						BidOnAuction((BidMessage) message);
+						BidOnAuction( message);
 						break;
 	
 					default: 
