@@ -60,6 +60,16 @@ public class Comms {
 		log.println("recieved message " + msg.toString());
 		return msg;
 	}
+	
+	private static String MessageToString(Message msg){
+		
+		return null;
+	}
+	
+	private static Message StringToMessage(String s){
+		
+		return null;
+	}
 
 	public PrintStream getLog() {
 		return log;

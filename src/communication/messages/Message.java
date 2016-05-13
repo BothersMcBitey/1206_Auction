@@ -13,6 +13,14 @@ public class Message implements Serializable{
 	private final int sessionNo;
 	private final MessageType type;
 	
+	public enum NotifyType{
+		Closed, Won, Impending, Shutdown
+	}
+	
+	public enum SortField{
+		Category, Seller, Title, Price, Time, Sold
+	}
+	
 	public Message(String clientIP, int sessionNo, MessageType type) {
 		this.timestamp = Date.from(Instant.now());
 		this.clientIP = clientIP.trim();

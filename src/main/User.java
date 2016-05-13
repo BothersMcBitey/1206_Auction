@@ -1,5 +1,7 @@
 package main;
 
+import java.util.ArrayList;
+
 public class User {
 
 	private final int UUID;	
@@ -7,13 +9,25 @@ public class User {
 	private String surname;
 	private String screenName;
 	private char[] passwordHash;
+	private ArrayList<Integer> bidOnItemIDs;
+	private ArrayList<Integer> sellingItemIDs;
 	
-	public User(int UUID, String forename, String surname, String screenName, char[] passwordHash){
+	public User(int UUID, String forename, String surname, String screenName, char[] passwordHash, ArrayList<Integer> bidOnItemIDs, ArrayList<Integer> sellingItemIDs){
 		this.UUID = UUID;
 		this.forename = forename;
 		this.surname = surname;
 		this.screenName = screenName;
 		this.passwordHash = passwordHash;
+		this.setBidOnItemIDs(bidOnItemIDs);
+		this.setSellingItemIDs(sellingItemIDs);
+	}
+	
+	public void addSellingItem(Integer UIID){
+		if(!sellingItemIDs.contains(UIID)) sellingItemIDs.add(UIID);
+	}
+	
+	public void addBidOnItem(Integer UIID){
+		if(!bidOnItemIDs.contains(UIID)) bidOnItemIDs.add(UIID);
 	}
 
 	public String getForename() {
@@ -50,5 +64,21 @@ public class User {
 
 	public void setScreenName(String screenName) {
 		this.screenName = screenName;
+	}
+
+	public ArrayList<Integer> getBidOnItemIDs() {
+		return bidOnItemIDs;
+	}
+
+	public void setBidOnItemIDs(ArrayList<Integer> bidOnItemIDs) {
+		this.bidOnItemIDs = bidOnItemIDs;
+	}
+
+	public ArrayList<Integer> getSellingItemIDs() {
+		return sellingItemIDs;
+	}
+
+	public void setSellingItemIDs(ArrayList<Integer> sellingItemIDs) {
+		this.sellingItemIDs = sellingItemIDs;
 	}
 }

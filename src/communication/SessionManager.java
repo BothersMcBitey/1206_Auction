@@ -5,22 +5,30 @@ import java.net.ServerSocket;
 import java.util.Date;
 
 import main.SynchronizedList;
+import server.DataManager;
 import server.DataPersistence;
 
-public class ServerCommsManager {
+public class SessionManager {
 
 	private ServerSocket socket;
 	private SynchronizedList<Session> connectedSessions;
  	
 	private Thread newConnectionListener;
 	
-	private DataPersistence dataAccess;
+	private DataManager data;
 	
-	public ServerCommsManager(int port, int backlog, DataPersistence dataAccess) throws IOException {
+	/**
+	 * 
+	 * @param port - The port to listen to
+	 * @param backlog - The number of connections that can be queued at once
+	 * @param data - The data manager to redirect information requests to
+	 * @throws IOException
+	 */
+	public SessionManager(int port, int backlog, DataManager data) throws IOException {
 		socket = new ServerSocket(port, backlog);
 		newConnectionListener = new Thread(new ConnectionListener());
 		newConnectionListener.start();
-		this.dataAccess = dataAccess; 
+		this.data = data;
 	}
 	
 	/**
@@ -53,7 +61,7 @@ public class ServerCommsManager {
 			int sessionID = 0;
 			while(true){
 				try {
-					connectedSessions.add(new Session(new Comms(socket.accept()), sessionID, System.out, dataAccess));
+//					connectedSessions.add(new Session(new Comms(socket.accept()), sessionID, System.out));
 					sessionID++;
 				} catch (IOException e) {
 					e.printStackTrace();
