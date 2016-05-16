@@ -5,31 +5,29 @@ import java.io.PrintStream;
 import java.net.SocketException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 
 import communication.messages.Message;
 import communication.messages.Message.NotifyType;
 import communication.messages.MessageType;
-import exceptions.AuctionCreationFailedException;
 import exceptions.AuctionTooShortException;
 import exceptions.BidTooLowException;
 import exceptions.EmptyStringException;
-import exceptions.IncorrectPasswordException;
 import exceptions.ItemAlreadyExistsException;
 import exceptions.ItemDoesNotExistException;
 import exceptions.PasswordTooShortException;
-import exceptions.RegistrationFailedException;
 import exceptions.ReserveTooLowException;
 import exceptions.UserAlreadyExistsException;
 import exceptions.UserAlreadyTopBidderException;
 import exceptions.UserDoesNotExistException;
-import javafx.util.Pair;
 import main.Bid;
 import main.Item;
+import main.ItemDisplayData;
 import main.User;
+import main.comparators.*;
 import server.DataManager;
-import server.DataPersistence;
 
 public class Session extends Thread{	
 	
@@ -89,10 +87,13 @@ public class Session extends Thread{
 					case ViewAuctionRequest:
 						sendAuctionData(message);
 						break;
+						
+					case SearchAuctionsRequest:
+						sendSearchResults(message);
+						
 	
 					default: 
-						log.println("unknown message type " + message.getType().toString());
-						//TODO: work out how to respond to this
+						sendError("Unknown message type: " + message.getType(), "Unknown message type");
 						break;
 				}
 				
@@ -106,6 +107,82 @@ public class Session extends Thread{
 		}
 	}
 	
+	private void sendSearchResults(Message message) throws IOException {
+		List<Item> items = new ArrayList<>();
+		//get active/closed items as needed
+		if(message.isSearchActive()) 
+			items.addAll(data.getAllActiveItems());
+		if(message.isSearchSold()) items.addAll(data.getAllClosedItems());
+		//filter selling/bidding as needed
+		if(message.isOnlyUserIsSelling()){
+			try {
+				items = data.getSellingItems(data.getUser(message.getUUID()), items);
+			} catch (UserDoesNotExistException e) {
+				sendError("Searched for auctions by unknown user", "vendor does not exist");
+			}
+		} else if(message.isOnlyUserIsBidding()){
+			try {
+				items = data.getBidOnItems(data.getUser(message.getUUID()), items);
+			} catch (UserDoesNotExistException e) {
+				sendError("Searched for bids by unkown user", "bidder does not exist");
+			}
+		}
+		//filter category as needed
+		if(message.getCategory() != null){
+			items = data.getCategory(message.getCategory(), items);
+		}
+		//filter time left as needed
+		if(message.isSearchTimeStarted()){
+			items = data.getItemsByDate(new Date(message.getStartTime()), items, message.isStartedBefore());
+		}
+		//filter price as needed
+		if(message.isSearchByPrice()){
+			items = data.getItemsByPrice(message.getTopBidValue(), items, message.isPriceIsGreater());
+		}
+		//sort as needed
+		switch (message.getSortField()) {
+			case Category:
+				items.sort(new CategoryComparator());
+				break;
+				
+			case Seller:
+				items.sort(new SellerComparator());
+				break;
+			
+			case Title:
+				items.sort(new TitleComparator());
+				break;
+				
+			case Price:
+				items.sort(new PriceComparator());
+				break;
+				
+			case Time:
+				items.sort(new StartTimeComparator());
+				break;
+				
+			case Sold:
+				items.sort(new SoldComparator());
+				break;
+			default:
+				break;
+		}
+		//reverse if needed
+		if(!message.isLowToHigh()) Collections.reverse(items);
+		//convert to display data
+		List<ItemDisplayData> itemsData = new ArrayList<>();
+		for(Item i : items){
+			itemsData.add(new ItemDisplayData(i.getUIID(), i.getTitle(), i.getDescription(), 
+					i.getCategory(), i.getVendor().getUUID(), i.getEndTime(), 
+					i.getTopBid().getValue(), i.getUserTopBid(user).getValue()));
+		}
+		//send
+		Message reply = new Message(clientIP, sessionNo, MessageType.SearchAuctionsResult);
+		reply.setSearchResults(itemsData);
+		log.println(sessionNo + ": Sending " + clientIP + " result for thir search");
+		comms.sendMessage(reply);
+	}
+
 	private void sendAuctionData(Message message) throws IOException{
 		Item item = null;
 		try {

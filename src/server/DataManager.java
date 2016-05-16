@@ -35,6 +35,11 @@ public class DataManager {
 	
 	public DataManager(PrintStream log) {
 		activeItems = new HashMap<Integer, Item>();
+		try {
+			activeItems.put(50, new Item(4, "title", "example", Category.Misc, new User(4, "dave", "daveson", "daveyboi", new char[] {'c','h','a','r'}), new Date(new Date().getTime() + 99999999), 45));
+		} catch (EmptyStringException | AuctionTooShortException | ReserveTooLowException e) {
+			e.printStackTrace();
+		}
 		closedItems = new HashMap<Integer, Item>();
 		users = new ArrayList<User>();
 		this.log = log;
@@ -68,28 +73,57 @@ public class DataManager {
 		return new Item(UIID, title, description, category, vendor, endTime, reservePrice);
 	}
 	
-	public void addItem(Item i) throws ItemAlreadyExistsException{
+	public synchronized void addItem(Item i) throws ItemAlreadyExistsException{
 		if(activeItems.containsKey(i.getUIID())) throw new ItemAlreadyExistsException();
 		activeItems.put(i.getUIID(), i);
 		i.getVendor().addSellingItem(i.getUIID());
 	}
 	
-	public List<Item> getCategory(Category cat){
-		List<Item> allInCategory = getAllItems();
-		//use toArray so that removing items from the list doesn't cause problems with iteration
-		for(Item i : allInCategory.toArray(new Item[1])){
-			if(!i.getCategory().equals(cat)) allInCategory.remove(i);
+	public List<Item> getCategory(Category cat, List<Item> list){
+		List<Item> items = new ArrayList<>();
+		for(Item i : list){
+			if(i.getCategory().equals(cat)) items.add(i);
 		}
-		return allInCategory;
+		return items;
 	}
 	
-	public List<Item> getAllItemsSince(Date date){
-		List<Item> allSince = getAllItems();
-		//use toArray so that removing items from the list doesn't cause problems with iteration
-		for(Item i : allSince.toArray(new Item[1])){
-			if(i.getStartTime().before(date)) allSince.remove(i);
+	/**
+	 * returns items in list created before given data if boolean is true, or after if false
+	 * @param date
+	 * @param list
+	 * @param before
+	 * @return
+	 */
+	public List<Item> getItemsByDate(Date date, List<Item> list, boolean before){
+		List<Item> itemsByDate = new ArrayList<>();
+		for(Item i : list){
+			if(before){
+				if(i.getStartTime().before(date)){ 
+					itemsByDate.add(i);
+				}
+			} else if(!before){
+				if(i.getStartTime().after(date)){
+					itemsByDate.add(i);
+				}
+			}
 		}
-		return allSince;
+		return itemsByDate;
+	}
+	
+	public List<Item> getItemsByPrice(int price, List<Item> list, boolean above){
+		List<Item> itemsByPrice = new ArrayList<>();
+		for(Item i : list){
+			if(above){
+				if(i.getTopBid().getValue() > price){
+					itemsByPrice.add(i);
+				}
+			} else {
+				if(i.getTopBid().getValue() < price){
+					itemsByPrice.add(i);
+				}
+			}
+		}
+		return itemsByPrice;
 	}
 	
 	public List<Item> getAllActiveItems(){
@@ -98,9 +132,15 @@ public class DataManager {
 		return all;
 	}
 	
+	public List<Item> getAllClosedItems(){
+		List<Item> all = new ArrayList<>();
+		all.addAll(closedItems.values());
+		return all;
+	}
+	
 	public List<Item> getAllItems(){
 		List<Item> all = getAllActiveItems();
-		all.addAll(closedItems.values());
+		all.addAll(getAllClosedItems());
 		return all;
 	}
 	
@@ -124,51 +164,21 @@ public class DataManager {
 		throw new UserDoesNotExistException(username);
 	}
 	
-	public List<Item> getActiveSellingItems(User u){
+	public List<Item> getSellingItems(User u, List<Item> list){
 		List<Item> items = new ArrayList<Item>();
 		for(Integer i : u.getSellingItemIDs()){
-			Item item = activeItems.get(i);
+			Item item = list.get(i);
 			if(item != null) items.add(item);
 		}
 		return items;
 	}
 	
-	public List<Item> getClosedSellingItems(User u){
-		List<Item> items = new ArrayList<Item>();
-		for(Integer i : u.getSellingItemIDs()){
-			Item item = closedItems.get(i);
-			if(item != null) items.add(item);
-		}
-		return items;
-	}
-	
-	public List<Item> getAllSellingItems(User u){
-		List<Item> items = getActiveSellingItems(u);
-		items.addAll(getClosedSellingItems(u));
-		return items;
-	}
-	
-	public List<Item> getActiveBidOnItems(User u){
+	public List<Item> getBidOnItems(User u, List<Item> list){
 		List<Item> items = new ArrayList<Item>();
 		for(Integer i : u.getBidOnItemIDs()){
-			Item item = activeItems.get(i);
+			Item item = list.get(i);
 			if(item != null) items.add(item);
 		}
-		return items;
-	}
-	
-	public List<Item> getClosedBidOnItems(User u){
-		List<Item> items = new ArrayList<Item>();
-		for(Integer i : u.getBidOnItemIDs()){
-			Item item = closedItems.get(i);
-			if(item != null) items.add(item);
-		}
-		return items;
-	}
-	
-	public List<Item> getAllBidOnItems(User u){
-		List<Item> items = getActiveBidOnItems(u);
-		items.addAll(getClosedBidOnItems(u));
 		return items;
 	}
 	
@@ -252,9 +262,10 @@ public class DataManager {
 		
 		do{
 			i = r.nextInt(Integer.MAX_VALUE);
-			
+			log.println("generated UIID " + i);
 			for(Item item : getAllItems()){
-				unique = i == item.getUIID();
+				if(i == item.getUIID())	unique = false; 
+				if(!unique) log.println(i + " is identical to " + item.getUIID());
 			}
 		} while (!unique);
 		

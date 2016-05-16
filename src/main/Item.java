@@ -62,16 +62,24 @@ public class Item implements Serializable{
 		user.addBidOnItem(UIID);
 	}
 	
-	public synchronized Bid getTopBid(){
-		int value = 0;
-		User user = null;
+	public synchronized Bid getUserTopBid(User u){
+		Bid bid = new Bid(u, 0);
 		for(Bid b : bids){
-			if(value < b.getValue()){
-				value = b.getValue();
-				user = b.getUser();
+			if(bid.getValue() <= b.getValue()){
+				bid = b;
 			}
 		}
-		return new Bid(user, value);
+		return bid;
+	}
+	
+	public synchronized Bid getTopBid(){
+		Bid topBid = new Bid(vendor, 0);
+		for(Bid b : bids){
+			if(topBid.getValue() <= b.getValue()){
+				topBid = b;
+			}
+		}
+		return topBid;
 	}
 
 	public String getTitle() {

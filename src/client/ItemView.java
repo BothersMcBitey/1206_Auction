@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
+import main.ItemDisplayData;
+
 public class ItemView extends JPanel {
 	
 	private ItemDisplayData i;
@@ -54,10 +56,10 @@ public class ItemView extends JPanel {
 		c.gridy = 2;
 		add(timeLeft, c);
 		
-		JButton view = new JButton("view " + i.UIID);
-		view.addActionListener(listener);
-		c.gridy = 3;
-		add(view, c);
+//		JButton view = new JButton("");
+//		view.addActionListener(listener);
+//		c.gridy = 3;
+//		add(view, c);
 	}
 
 }

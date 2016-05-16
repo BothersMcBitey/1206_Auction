@@ -2,12 +2,15 @@ package client;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import main.ItemDisplayData;
 
 public class ClientUI {
 
@@ -75,6 +78,10 @@ public class ClientUI {
 	public void displayCreateAuction(){
 		if(createAuction == null) createAuction = new CreateAuction(listener);
 		display(createAuction);
+	}
+	
+	public void displaySearchResults(List<ItemDisplayData> items, boolean searchBar){
+		display(new ItemListView(listener, items, searchBar));
 	}
 	
 	public LogIn getLogIn() {

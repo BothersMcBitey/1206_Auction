@@ -1,10 +1,9 @@
-package client;
+package main;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import main.Category;
-
-public class ItemDisplayData {
+public class ItemDisplayData implements Serializable {
 
 	public final int UIID;
 	public String title;

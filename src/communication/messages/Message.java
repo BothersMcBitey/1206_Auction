@@ -3,8 +3,10 @@ package communication.messages;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import main.Category;
+import main.ItemDisplayData;
 
 public class Message implements Serializable{
 
@@ -21,9 +23,9 @@ public class Message implements Serializable{
 	private Category category;
 	private NotifyType noteType;
 	private SortField sortField;
-	private boolean isSold, timeIsGreater, priceIsGreater, userHasBidOn, lowToHigh;
+	private boolean searchActive, searchSold, searchTimeStarted, searchByPrice, startedBefore, priceIsGreater, onlyUserIsSelling, onlyUserHasBidOn, lowToHigh;
 	private long startTime, endTime, timeLeft;
-	//TODO: Add search results somehow
+	private List<ItemDisplayData> searchResults;
 	
 	public enum NotifyType{
 		Closed, Won, Impending, Shutdown
@@ -38,6 +40,7 @@ public class Message implements Serializable{
 		this.clientIP = clientIP.trim();
 		this.sessionNo = sessionNo;
 		this.type = type;
+		searchActive = true;
 	}
 
 	public Date getTimestamp() {
@@ -185,20 +188,20 @@ public class Message implements Serializable{
 		this.sortField = sortField;
 	}
 
-	public boolean isSold() {
-		return isSold;
+	public boolean isSearchSold() {
+		return searchSold;
 	}
 
-	public void setSold(boolean isSold) {
-		this.isSold = isSold;
+	public void setSearchSold(boolean searchSold) {
+		this.searchSold = searchSold;
 	}
 
-	public boolean isTimeIsGreater() {
-		return timeIsGreater;
+	public boolean isStartedBefore() {
+		return startedBefore;
 	}
 
-	public void setTimeIsGreater(boolean timeIsGreater) {
-		this.timeIsGreater = timeIsGreater;
+	public void setStartedBefore(boolean startedBefore) {
+		this.startedBefore = startedBefore;
 	}
 
 	public boolean isPriceIsGreater() {
@@ -209,12 +212,12 @@ public class Message implements Serializable{
 		this.priceIsGreater = priceIsGreater;
 	}
 
-	public boolean isUserHasBidOn() {
-		return userHasBidOn;
+	public boolean isOnlyUserIsBidding() {
+		return onlyUserHasBidOn;
 	}
 
-	public void setUserHasBidOn(boolean userHasBidOn) {
-		this.userHasBidOn = userHasBidOn;
+	public void setOnlyUserIsBidding(boolean userHasBidOn) {
+		this.onlyUserHasBidOn = userHasBidOn;
 	}
 
 	public boolean isLowToHigh() {
@@ -263,5 +266,45 @@ public class Message implements Serializable{
 
 	public void setTopBidValue(int topBidValue) {
 		this.topBidValue = topBidValue;
+	}
+
+	public List<ItemDisplayData> getSearchResults() {
+		return searchResults;
+	}
+
+	public void setSearchResults(List<ItemDisplayData> searchResults) {
+		this.searchResults = searchResults;
+	}
+
+	public boolean isSearchActive() {
+		return searchActive;
+	}
+
+	public void setSearchActive(boolean searchActive) {
+		this.searchActive = searchActive;
+	}
+
+	public boolean isOnlyUserIsSelling() {
+		return onlyUserIsSelling;
+	}
+
+	public void setOnlyUserIsSelling(boolean userIsSelling) {
+		this.onlyUserIsSelling = userIsSelling;
+	}
+
+	public boolean isSearchTimeStarted() {
+		return searchTimeStarted;
+	}
+
+	public void setSearchTimeStarted(boolean searchTimeStarted) {
+		this.searchTimeStarted = searchTimeStarted;
+	}
+
+	public boolean isSearchByPrice() {
+		return searchByPrice;
+	}
+
+	public void setSearchByPrice(boolean searchByPrice) {
+		this.searchByPrice = searchByPrice;
 	}
 }

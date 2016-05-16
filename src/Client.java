@@ -8,12 +8,13 @@ import javax.swing.SwingUtilities;
 
 import client.ClientUI;
 import client.CreateAuction;
-import client.ItemDisplayData;
 import client.LogIn;
 import communication.Comms;
 import communication.messages.Message;
+import communication.messages.Message.SortField;
 import communication.messages.MessageType;
 import main.Category;
+import main.ItemDisplayData;
 
 public class Client implements ActionListener{
 	
@@ -73,7 +74,11 @@ public class Client implements ActionListener{
 				break;
 				
 			case "Create Auction" :
-				createAuction();
+				createAuction();				
+				break;
+				
+			case "Browse Auctions" :
+				browseAuctions();
 				break;
 				
 			default :
@@ -82,6 +87,25 @@ public class Client implements ActionListener{
 					viewItem(UIID);
 				}
 				break;
+		}
+	}
+
+	private void browseAuctions() {
+		Message msg = new Message(serverIP, sessionNo, MessageType.SearchAuctionsRequest);
+		msg.setSortField(SortField.Time);
+		msg.setLowToHigh(true);
+		try {
+			comms.sendMessage(msg);
+			Message reply = comms.receiveMessage();
+			if(reply.getType() == MessageType.Failure){
+				ui.showNotification("Failed to retrieve data: " + reply.getErrorMessage());
+			} else if(reply.getType() == MessageType.SearchAuctionsResult){				
+				ui.displaySearchResults(reply.getSearchResults(), true);
+			} else {
+				ui.showNotification("Error communicating with server");
+			}
+		} catch (IOException | ClassNotFoundException e1) {
+			e1.printStackTrace();
 		}
 	}
 

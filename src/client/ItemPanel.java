@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
+import main.ItemDisplayData;
+
 public class ItemPanel extends JPanel{
 	
 	private static final int DESCRIPTION_MAX_LENGTH = 20;
@@ -59,6 +61,7 @@ public class ItemPanel extends JPanel{
 		add(timeLeft, c);
 		
 		JButton view = new JButton("view");
+		view.setActionCommand("view " + i.UIID);
 		view.addActionListener(listener);
 		c.gridy = 3;
 		add(view, c);

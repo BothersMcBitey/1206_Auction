@@ -21,7 +21,7 @@ public class DataPersistence {
 	private File itemFile, logFile, userFile;
 	private Path dataPath, logPath, userPath;
 	private PrintStream log;
-
+	
 	public DataPersistence(PrintStream log) {
 		this.log = log;
 		dataPath = Paths.get("auctionData.auc");
@@ -29,15 +29,7 @@ public class DataPersistence {
 		userPath = Paths.get("userData.auc");
 		
 		itemFile = new File(dataPath.toString());
-		
-		try{
-			if(!Files.exists(dataPath)){
-				Files.createFile(dataPath);
-			}
-		} catch(IOException e){
-			e.printStackTrace();
-		}
-		
+		userFile = new File(userPath.toString());
 		logFile= new File(logPath.toString());
 		
 		try{
@@ -47,8 +39,18 @@ public class DataPersistence {
 		} catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void WriteOutData(Map<Integer, Item> items, List<User> users){
+		try{
+			if(!Files.exists(dataPath)){
+				Files.createFile(dataPath);
+			}
+		} catch(IOException e){
+			e.printStackTrace();
+		}			
 		
-		userFile = new File(userPath.toString());
+		
 		
 		try{
 			if(!Files.exists(userPath)){
@@ -57,9 +59,7 @@ public class DataPersistence {
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-	}
-	
-	public void WriteOutData(Map<Integer, Item> items, List<User> users){
+		
 		try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userFile))){
 			out.writeObject(users);
 			out.flush();
@@ -91,11 +91,11 @@ public class DataPersistence {
 	}
 	
 	public List<User> ReadInUserData(){
-		if(!Files.exists(userPath)) return null;
+		if(!Files.exists(userPath)) return null; 
 		 List<User> data = null;
 		
 		try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(userFile))){
-			data = ( List<User>) in.readObject();
+			data = (List<User>) in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
